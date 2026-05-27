@@ -39,16 +39,17 @@
             top: 0;
             z-index: 100;
             width: 100%;
-            transition: max-height 0.3s ease, opacity 0.3s ease;
-            max-height: 60px; /* Adjust if your tabs are taller */
+            /* Smoothly animate tab sliding up/down */
+            max-height: 60px; 
             overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.2s ease;
             opacity: 1;
         }
 
-        /* Class to completely hide the tabs */
+        /* Class applied to hide the tabs */
         .tab-nav.hidden-tabs {
             max-height: 0 !important;
-            border-bottom: none;
+            border-bottom: none !important;
             opacity: 0;
             pointer-events: none;
         }
@@ -247,20 +248,6 @@
             border: none;
         }
 
-        /* Mobile Platform Warning Flag Overlay Banner */
-        .mobile-restriction-warning {
-            display: none;
-            width: 100%;
-            background-color: #fee2e2;
-            color: #b91c1c;
-            padding: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 20px;
-            border-radius: 6px;
-        }
-
         .top-bar {
             width: 100%;
             display: flex;
@@ -273,14 +260,14 @@
             font-size: 20px;
             color: var(--accent);
             cursor: pointer;
-            padding: 10px;
+            padding: 4px;
         }
 
-        /* Visual rotation helper for chevron toggle button */
-        .top-bar i.fa-chevron-down {
+        /* Rotate chevron icon when menu hidden */
+        .fa-chevron-down {
             transition: transform 0.3s ease;
         }
-        .top-bar i.fa-chevron-down.tabs-are-hidden {
+        .fa-chevron-down.inverted {
             transform: rotate(180deg);
         }
 
@@ -305,7 +292,7 @@
             position: relative;
         }
 
-        /* Album Cover Box (Retains its design shadow inside the flat screen context) */
+        /* Album Cover Box */
         .album-art-container {
             width: 100%;
             height: 100%;
@@ -427,7 +414,7 @@
 </head>
 <body>
 
-    <div class="tab-nav" id="main-tab-navigation">
+    <div class="tab-nav" id="main-tabs">
         <button class="tab-btn active" onclick="switchPanelTab('manager')">
             <i class="fa-solid fa-folder-open"></i> 1. Select Asset
         </button>
@@ -443,7 +430,7 @@
             <div class="upload-zone" onclick="document.getElementById('file-input').click()">
                 <i class="fa-solid fa-photo-film"></i>
                 <p>Click to upload <strong>MP3 Audio</strong> or <strong>MP4 Video</strong> tracks</p>
-                <p style="font-size: 11px; margin-top: 5px; color: #10b981;">(Fixed: Audio files are now supported everywhere!)</p>
+                <p style="font-size: 11px; margin-top: 5px; color: #22c55e;">(Unlocked: Every audio format fully functional on phones)</p>
                 <input type="file" id="file-input" accept="audio/*,video/mp4">
             </div>
 
@@ -468,22 +455,16 @@
             <button class="primary-btn" id="save-track-btn">Apply Asset Metadata Modifications</button>
 
             <div class="track-list-container">
-                <div id="track-list-target">
-                    </div>
+                <div id="track-list-target"></div>
             </div>
         </div>
     </div>
 
     <div id="panel-player" class="tab-panel">
         <div class="player-view">
-            
-            <div class="mobile-restriction-warning" id="mobile-alert-banner">
-                ⚠️ Audio files disabled on mobile screen parameters. Please choose an MP4 video tracking asset file.
-            </div>
 
             <div class="top-bar">
-                <!-- Added id="hide-tabs-trigger" to make this functional -->
-                <i class="fa-solid fa-chevron-down" id="hide-tabs-trigger"></i>
+                <i class="fa-solid fa-chevron-down" id="collapse-chevron-btn"></i>
                 <i class="fa-solid fa-ellipsis-vertical"></i>
             </div>
 
@@ -522,7 +503,6 @@
     <audio id="native-audio-node" preload="auto"></audio>
 
     <script>
-        // Track Inventory Structure Arrays Engine Store
         let tracks = [
             { name: "4. ONDEADON - Tito Double P", url: "", type: "audio", isPlaceholder: true, placeholderDuration: 141, fakeDuration: 141 },
             { name: "1. Dembow Belico - Luis R Conriquez", url: "", type: "audio", isPlaceholder: true, placeholderDuration: 185, fakeDuration: 185 },
@@ -535,7 +515,7 @@
         let mockPlaceholderTime = 73; 
         let activePlaybackEngineNode = null; 
 
-        // DOM Structural View Pointers
+        // DOM Pointers
         const audioEngineNode = document.getElementById('native-audio-node');
         const videoEngineNode = document.getElementById('native-video-node');
         const audioCoverPlaceholder = document.getElementById('dom-audio-placeholder-cover');
@@ -548,7 +528,6 @@
         const nextBtn = document.getElementById('next-btn');
         const waveformTimeline = document.getElementById('waveform-track-timeline');
         const waveformWindow = document.getElementById('waveform-window');
-        const mobileAlertBanner = document.getElementById('mobile-alert-banner');
         
         const trackListTarget = document.getElementById('track-list-target');
         const trackNameInput = document.getElementById('track-name-input');
@@ -559,12 +538,6 @@
         const formActionLabel = document.getElementById('form-action-label');
         const fileInput = document.getElementById('file-input');
 
-        // Verify device viewport constraints logic loop
-        function checkMobileDeviceContext() {
-            return (window.innerWidth <= 768 || /Mobi|Android|iPhone/i.test(navigator.userAgent));
-        }
-
-        // Handles switching between separate view panels smoothly
         window.switchPanelTab = function(targetPanel) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -575,7 +548,6 @@
             } else {
                 document.querySelectorAll('.tab-btn')[1].classList.add('active');
                 document.getElementById('panel-player').classList.add('active');
-                // Trigger view refreshing upon selection
                 loadTargetTrackInstance(currentTrackIndex, false);
             }
         };
@@ -586,18 +558,17 @@
             loadTargetTrackInstance(currentTrackIndex, false);
             setupEventInteractions();
             
-            // Monitor real-time screen adjustments
             window.addEventListener('resize', () => {
                 loadTargetTrackInstance(currentTrackIndex, false);
             });
 
-            // FIXED: Toggle layout visibility system for the navigation tabs
-            const chevronTrigger = document.getElementById('hide-tabs-trigger');
-            const tabNavigationMenu = document.getElementById('main-tab-navigation');
+            // FIXED: Functional layout collapse control for top selection tabs
+            const chevronBtn = document.getElementById('collapse-chevron-btn');
+            const tabHeaderMenu = document.getElementById('main-tabs');
             
-            chevronTrigger.addEventListener('click', () => {
-                tabNavigationMenu.classList.toggle('hidden-tabs');
-                chevronTrigger.classList.toggle('tabs-are-hidden');
+            chevronBtn.addEventListener('click', () => {
+                tabHeaderMenu.classList.toggle('hidden-tabs');
+                chevronBtn.classList.toggle('inverted');
             });
         }
 
@@ -620,7 +591,6 @@
         function loadTargetTrackInstance(index, triggerPlayback = false) {
             if (index < 0 || index >= tracks.length) return;
             
-            // Immediate reset active media playback processes safely
             audioEngineNode.pause();
             videoEngineNode.pause();
             
@@ -628,9 +598,8 @@
             const track = tracks[currentTrackIndex];
 
             playerTrackTitle.innerText = track.name;
-            mobileAlertBanner.style.display = "none"; // REMOVED: Mobile block condition here
 
-            // Route execution properties between audio/video asset categories
+            // FIXED: Removed absolute block/alert banner handling logic for audio files completely
             if (track.type === "video") {
                 activePlaybackEngineNode = videoEngineNode;
                 audioCoverPlaceholder.style.display = "none";
@@ -642,7 +611,6 @@
                 
                 videoEngineNode.onloadedmetadata = () => calculateAndSyncFakeProgress();
             } else {
-                // Handling Audio Assets (Now perfectly running on desktop AND mobile viewports!)
                 activePlaybackEngineNode = audioEngineNode;
                 audioCoverPlaceholder.style.display = "flex";
                 videoEngineNode.style.display = "none";
@@ -711,7 +679,6 @@
         }
 
         function setupEventInteractions() {
-            // Live Update Hook Mapping
             const syncProgressHandler = () => {
                 const track = tracks[currentTrackIndex];
                 if (!track.isPlaceholder) calculateAndSyncFakeProgress();
@@ -730,7 +697,6 @@
             audioEngineNode.addEventListener('ended', trackEndRouteHandler);
             videoEngineNode.addEventListener('ended', trackEndRouteHandler);
 
-            // Scrubber and Core Operational Play Buttons Event Mapping
             playBtn.addEventListener('click', () => {
                 const track = tracks[currentTrackIndex];
                 
@@ -769,7 +735,6 @@
                 }
             });
 
-            // Local File Upload Core System Engine Parsers
             fileInput.addEventListener('change', (e) => handleImportedFilesList(e.target.files));
         }
 
@@ -809,7 +774,6 @@
             tracks.push(newTrackDataStructure);
             renderDashboardPlaylist();
             
-            // Switch tabs directly to player window automatically upon select event
             switchPanelTab('player');
             loadTargetTrackInstance(tracks.length - 1, true);
         }
@@ -835,7 +799,6 @@
                     displayDuration = "Native Dynamic Time";
                 }
 
-                // Add clear badge icon properties tags mapping visually
                 const typeIcon = track.type === 'video' ? '<i class="fa-solid fa-video"></i>' : '<i class="fa-solid fa-music"></i>';
 
                 item.innerHTML = `
@@ -913,7 +876,6 @@
             loadTargetTrackInstance(currentTrackIndex, false);
         };
 
-        // Initialize Runtime Execution Pipeline
         initializeApplication();
     </script>
 </body>
