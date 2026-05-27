@@ -39,6 +39,18 @@
             top: 0;
             z-index: 100;
             width: 100%;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+            max-height: 60px; /* Adjust if your tabs are taller */
+            overflow: hidden;
+            opacity: 1;
+        }
+
+        /* Class to completely hide the tabs */
+        .tab-nav.hidden-tabs {
+            max-height: 0 !important;
+            border-bottom: none;
+            opacity: 0;
+            pointer-events: none;
         }
 
         .tab-btn {
@@ -230,7 +242,6 @@
             flex-direction: column;
             align-items: center;
             background-color: #ffffff;
-            /* Explicitly removed all container borders, radius curves, and outer frame shadows */
             box-shadow: none;
             border-radius: 0;
             border: none;
@@ -261,6 +272,16 @@
         .top-bar i {
             font-size: 20px;
             color: var(--accent);
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        /* Visual rotation helper for chevron toggle button */
+        .top-bar i.fa-chevron-down {
+            transition: transform 0.3s ease;
+        }
+        .top-bar i.fa-chevron-down.tabs-are-hidden {
+            transform: rotate(180deg);
         }
 
         .track-info {
@@ -406,7 +427,7 @@
 </head>
 <body>
 
-    <div class="tab-nav">
+    <div class="tab-nav" id="main-tab-navigation">
         <button class="tab-btn active" onclick="switchPanelTab('manager')">
             <i class="fa-solid fa-folder-open"></i> 1. Select Asset
         </button>
@@ -422,7 +443,7 @@
             <div class="upload-zone" onclick="document.getElementById('file-input').click()">
                 <i class="fa-solid fa-photo-film"></i>
                 <p>Click to upload <strong>MP3 Audio</strong> or <strong>MP4 Video</strong> tracks</p>
-                <p style="font-size: 11px; margin-top: 5px; color: #9ca3af;">(Note: Audio files will automatically be disabled on mobile viewports)</p>
+                <p style="font-size: 11px; margin-top: 5px; color: #10b981;">(Fixed: Audio files are now supported everywhere!)</p>
                 <input type="file" id="file-input" accept="audio/*,video/mp4">
             </div>
 
@@ -461,7 +482,8 @@
             </div>
 
             <div class="top-bar">
-                <i class="fa-solid fa-chevron-down"></i>
+                <!-- Added id="hide-tabs-trigger" to make this functional -->
+                <i class="fa-solid fa-chevron-down" id="hide-tabs-trigger"></i>
                 <i class="fa-solid fa-ellipsis-vertical"></i>
             </div>
 
@@ -568,6 +590,15 @@
             window.addEventListener('resize', () => {
                 loadTargetTrackInstance(currentTrackIndex, false);
             });
+
+            // FIXED: Toggle layout visibility system for the navigation tabs
+            const chevronTrigger = document.getElementById('hide-tabs-trigger');
+            const tabNavigationMenu = document.getElementById('main-tab-navigation');
+            
+            chevronTrigger.addEventListener('click', () => {
+                tabNavigationMenu.classList.toggle('hidden-tabs');
+                chevronTrigger.classList.toggle('tabs-are-hidden');
+            });
         }
 
         function generateWaveformTemplateProfile() {
@@ -595,22 +626,9 @@
             
             currentTrackIndex = index;
             const track = tracks[currentTrackIndex];
-            const isMobile = checkMobileDeviceContext();
 
             playerTrackTitle.innerText = track.name;
-            mobileAlertBanner.style.display = "none";
-
-            // Enforce explicit mobile restriction rules
-            if (isMobile && track.type === "audio") {
-                activePlaybackEngineNode = null;
-                audioCoverPlaceholder.style.display = "flex";
-                videoEngineNode.style.display = "none";
-                mobileAlertBanner.style.display = "block";
-                updateWaveformScrubView(0, track.fakeDuration || track.placeholderDuration || 120);
-                updatePlayPauseButtonUIState();
-                renderDashboardPlaylist();
-                return;
-            }
+            mobileAlertBanner.style.display = "none"; // REMOVED: Mobile block condition here
 
             // Route execution properties between audio/video asset categories
             if (track.type === "video") {
@@ -624,7 +642,7 @@
                 
                 videoEngineNode.onloadedmetadata = () => calculateAndSyncFakeProgress();
             } else {
-                // Handling Standard Desktop Audio Assets
+                // Handling Audio Assets (Now perfectly running on desktop AND mobile viewports!)
                 activePlaybackEngineNode = audioEngineNode;
                 audioCoverPlaceholder.style.display = "flex";
                 videoEngineNode.style.display = "none";
@@ -715,7 +733,6 @@
             // Scrubber and Core Operational Play Buttons Event Mapping
             playBtn.addEventListener('click', () => {
                 const track = tracks[currentTrackIndex];
-                if (track.type === "audio" && checkMobileDeviceContext()) return;
                 
                 if (track.isPlaceholder) {
                     alert("This placeholder profile item requires a valid local file track upload first.");
@@ -737,7 +754,6 @@
 
             waveformWindow.addEventListener('click', (e) => {
                 const track = tracks[currentTrackIndex];
-                if (track.type === "audio" && checkMobileDeviceContext()) return;
 
                 const rect = waveformWindow.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
