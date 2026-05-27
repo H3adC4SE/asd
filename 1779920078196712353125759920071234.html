@@ -6,11 +6,7 @@
     <title>Dynamic Audio & Video Player Widget</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
             --bg-color: #ffffff;
@@ -30,7 +26,6 @@
             flex-direction: column;
         }
 
-        /* Fixed Navigation Tab System Headers */
         .tab-nav {
             display: flex;
             background-color: #f3f4f6;
@@ -39,14 +34,12 @@
             top: 0;
             z-index: 100;
             width: 100%;
-            /* Smoothly animate tab sliding up/down */
-            max-height: 60px; 
+            max-height: 60px;
             overflow: hidden;
             transition: max-height 0.3s ease-out, opacity 0.2s ease;
             opacity: 1;
         }
 
-        /* Class applied to hide the tabs */
         .tab-nav.hidden-tabs {
             max-height: 0 !important;
             border-bottom: none !important;
@@ -78,19 +71,9 @@
             background-color: #ffffff;
         }
 
-        /* View Panels Routing Windows */
-        .tab-panel {
-            display: none;
-            width: 100%;
-            flex: 1;
-        }
+        .tab-panel { display: none; width: 100%; flex: 1; }
+        .tab-panel.active { display: flex; flex-direction: column; }
 
-        .tab-panel.active {
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* TAB 1: Studio Library Configuration Manager Layout */
         .manager-view {
             padding: 24px;
             max-width: 600px;
@@ -98,13 +81,8 @@
             margin: 0 auto;
         }
 
-        .dashboard-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
+        .dashboard-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
 
-        /* File Type Explicit Multi Uploader Control */
         .upload-zone {
             border: 2px dashed #d1d5db;
             border-radius: 12px;
@@ -116,30 +94,13 @@
             background-color: #fafafa;
         }
 
-        .upload-zone:hover {
-            border-color: var(--accent);
-            background-color: #f3f4f6;
-        }
+        .upload-zone:hover { border-color: var(--accent); background-color: #f3f4f6; }
+        .upload-zone i { font-size: 36px; color: var(--text-muted); margin-bottom: 12px; }
+        .upload-zone p { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
 
-        .upload-zone i {
-            font-size: 36px;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
+        #file-input { display: none; }
 
-        .upload-zone p {
-            font-size: 14px;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        #file-input {
-            display: none;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
+        .form-group { margin-bottom: 16px; }
 
         .form-group label {
             display: block;
@@ -158,9 +119,7 @@
             outline: none;
         }
 
-        .form-group input:focus {
-            border-color: var(--accent);
-        }
+        .form-group input:focus { border-color: var(--accent); }
 
         .primary-btn {
             width: 100%;
@@ -192,15 +151,8 @@
             border: 1px solid transparent;
         }
 
-        .track-item.active {
-            background-color: #f3f4f6;
-            border-color: var(--accent);
-        }
-
-        .track-item-info {
-            flex: 1;
-            overflow: hidden;
-        }
+        .track-item.active { background-color: #f3f4f6; border-color: var(--accent); }
+        .track-item-info { flex: 1; overflow: hidden; }
 
         .track-item-name {
             font-size: 14px;
@@ -210,16 +162,8 @@
             text-overflow: ellipsis;
         }
 
-        .track-item-meta {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .track-actions {
-            display: flex;
-            gap: 4px;
-        }
+        .track-item-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .track-actions { display: flex; gap: 4px; }
 
         .action-btn {
             background: none;
@@ -233,7 +177,6 @@
         .action-btn.edit-btn:hover { color: #2563eb; }
         .action-btn.delete-btn:hover { color: #dc2626; }
 
-        /* TAB 2: Unbounded Flat Edge Visualizer Player Screen */
         .player-view {
             width: 100%;
             max-width: 430px;
@@ -243,9 +186,6 @@
             flex-direction: column;
             align-items: center;
             background-color: #ffffff;
-            box-shadow: none;
-            border-radius: 0;
-            border: none;
         }
 
         .top-bar {
@@ -256,20 +196,10 @@
             margin-bottom: 30px;
         }
 
-        .top-bar i {
-            font-size: 20px;
-            color: var(--accent);
-            cursor: pointer;
-            padding: 4px;
-        }
+        .top-bar i { font-size: 20px; color: var(--accent); cursor: pointer; padding: 4px; }
 
-        /* Rotate chevron icon when menu hidden */
-        .fa-chevron-down {
-            transition: transform 0.3s ease;
-        }
-        .fa-chevron-down.inverted {
-            transform: rotate(180deg);
-        }
+        .fa-chevron-down { transition: transform 0.3s ease; }
+        .fa-chevron-down.inverted { transform: rotate(180deg); }
 
         .track-info {
             font-size: 17px;
@@ -284,7 +214,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Asset Stage Viewport: Handles Native MP4 Video or Audio Placeholder Shapes */
         .stage-viewport-container {
             width: 100%;
             aspect-ratio: 1 / 1;
@@ -292,7 +221,6 @@
             position: relative;
         }
 
-        /* Album Cover Box */
         .album-art-container {
             width: 100%;
             height: 100%;
@@ -301,26 +229,20 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.35), 
-                        0 10px 15px -5px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 35px -5px rgba(0,0,0,0.35), 0 10px 15px -5px rgba(0,0,0,0.2);
         }
 
-        /* Inline Streaming Video Component View */
         .native-video-render {
             width: 100%;
             height: 100%;
             object-fit: cover;
             border-radius: 24px;
             background-color: #000000;
-            box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 20px 35px -5px rgba(0,0,0,0.35);
             display: none;
         }
 
-        .audio-wave-icon {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
+        .audio-wave-icon { display: flex; align-items: center; gap: 3px; }
 
         .audio-wave-icon span {
             display: block;
@@ -356,7 +278,7 @@
             height: 20px;
             fill: none;
             stroke: var(--accent);
-            stroke-width: 2.5; 
+            stroke-width: 2.5;
             stroke-linecap: round;
             stroke-linejoin: round;
         }
@@ -381,9 +303,7 @@
             margin-bottom: 24px;
         }
 
-        .time-badge span {
-            opacity: 0.5;
-        }
+        .time-badge span { opacity: 0.5; }
 
         .waveform-scroll-window {
             width: 100%;
@@ -401,15 +321,26 @@
             width: 100%;
         }
 
-        .wave-bar {
-            flex: 1;
-            height: 10px;
-            border-radius: 1px;
-            pointer-events: none; 
-        }
-
+        .wave-bar { flex: 1; height: 10px; border-radius: 1px; pointer-events: none; }
         .wave-bar.played { background-color: var(--wave-played); }
         .wave-bar.remaining { background-color: var(--wave-remaining); }
+
+        /* Loading indicator for iOS audio decode */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff40;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .play-pause-btn.loading .fa-play,
+        .play-pause-btn.loading .fa-pause { display: none; }
+        .play-pause-btn.loading .loading-spinner { display: block; }
     </style>
 </head>
 <body>
@@ -426,16 +357,21 @@
     <div id="panel-manager" class="tab-panel active">
         <div class="manager-view">
             <div class="dashboard-title">Select & Manage Assets</div>
-            
+
             <div class="upload-zone" onclick="document.getElementById('file-input').click()">
                 <i class="fa-solid fa-photo-film"></i>
                 <p>Click to upload <strong>MP3 Audio</strong> or <strong>MP4 Video</strong> tracks</p>
-                <p style="font-size: 11px; margin-top: 5px; color: #22c55e;">(Unlocked: Every audio format fully functional on phones)</p>
+                <p style="font-size: 11px; margin-top: 5px; color: #22c55e;">(iOS compatible — tap to select from Files or Photos)</p>
+                <!--
+                    iOS FIX #1: accept="audio/*,video/mp4" is correct.
+                    Do NOT use capture attribute — it prevents file picker from showing on iOS.
+                    The input must be triggered by a direct user tap (which this upload-zone does).
+                -->
                 <input type="file" id="file-input" accept="audio/*,video/mp4">
             </div>
 
             <input type="hidden" id="edit-index" value="-1">
-            
+
             <div class="form-group">
                 <label id="form-action-label" for="track-name-input">Track Identity Title Text</label>
                 <input type="text" id="track-name-input" placeholder="Configure displayed text configuration override">
@@ -462,7 +398,6 @@
 
     <div id="panel-player" class="tab-panel">
         <div class="player-view">
-
             <div class="top-bar">
                 <i class="fa-solid fa-chevron-down" id="collapse-chevron-btn"></i>
                 <i class="fa-solid fa-ellipsis-vertical"></i>
@@ -476,8 +411,13 @@
                         <span></span><span></span><span></span><span></span><span></span>
                     </div>
                 </div>
-                
-                <video class="native-video-render" id="native-video-node" playsinline></video>
+                <!--
+                    iOS FIX #2: both playsinline AND webkit-playsinline are required
+                    for inline playback on iOS Safari (older versions need the webkit prefix).
+                    Without these, iOS forces fullscreen video and blocks autoplay entirely.
+                -->
+                <video class="native-video-render" id="native-video-node"
+                       playsinline webkit-playsinline muted></video>
             </div>
 
             <div class="controls">
@@ -486,6 +426,7 @@
                 </button>
                 <button class="control-btn play-pause-btn" id="play-btn">
                     <i class="fa-solid fa-play" id="play-icon"></i>
+                    <div class="loading-spinner"></div>
                 </button>
                 <button class="control-btn" id="next-btn">
                     <svg viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="4" x2="19" y2="20"></line></svg>
@@ -500,7 +441,11 @@
         </div>
     </div>
 
-    <audio id="native-audio-node" preload="auto"></audio>
+    <!--
+        iOS FIX #3: Remove preload="auto" — iOS Safari ignores it and it can
+        actually interfere with src assignment timing. Let iOS load on demand.
+    -->
+    <audio id="native-audio-node"></audio>
 
     <script>
         let tracks = [
@@ -512,14 +457,18 @@
         let currentTrackIndex = 0;
         const barResolutionDensity = 75;
         let waveformHeightsMap = [];
-        let mockPlaceholderTime = 73; 
-        let activePlaybackEngineNode = null; 
+        let mockPlaceholderTime = 73;
+        let activePlaybackEngineNode = null;
 
-        // DOM Pointers
+        // iOS FIX #4: Track whether audio context has been unlocked.
+        // iOS Safari silently blocks ALL audio until the user has tapped something
+        // that directly calls .play() in the same synchronous call stack.
+        // We unlock it once on first user tap.
+        let audioContextUnlocked = false;
+
         const audioEngineNode = document.getElementById('native-audio-node');
         const videoEngineNode = document.getElementById('native-video-node');
         const audioCoverPlaceholder = document.getElementById('dom-audio-placeholder-cover');
-        
         const playerTrackTitle = document.getElementById('player-track-title');
         const playerTimeBadge = document.getElementById('player-time-badge');
         const playIcon = document.getElementById('play-icon');
@@ -528,7 +477,6 @@
         const nextBtn = document.getElementById('next-btn');
         const waveformTimeline = document.getElementById('waveform-track-timeline');
         const waveformWindow = document.getElementById('waveform-window');
-        
         const trackListTarget = document.getElementById('track-list-target');
         const trackNameInput = document.getElementById('track-name-input');
         const fakeMinInput = document.getElementById('fake-min-input');
@@ -538,10 +486,27 @@
         const formActionLabel = document.getElementById('form-action-label');
         const fileInput = document.getElementById('file-input');
 
+        // iOS FIX #5: Unlock audio engine on the very first user gesture.
+        // We do this by calling .play() then immediately .pause() on a silent src.
+        // This gesture-based unlock persists for the page session on iOS.
+        function unlockAudioForIOS() {
+            if (audioContextUnlocked) return;
+            audioContextUnlocked = true;
+
+            // Play a zero-duration silent buffer to satisfy iOS gesture requirement
+            const silentUnlock = new Audio();
+            silentUnlock.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+            silentUnlock.volume = 0;
+            const unlockPromise = silentUnlock.play();
+            if (unlockPromise !== undefined) {
+                unlockPromise.then(() => silentUnlock.pause()).catch(() => {});
+            }
+        }
+
         window.switchPanelTab = function(targetPanel) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            
+
             if (targetPanel === 'manager') {
                 document.querySelectorAll('.tab-btn')[0].classList.add('active');
                 document.getElementById('panel-manager').classList.add('active');
@@ -557,19 +522,23 @@
             renderDashboardPlaylist();
             loadTargetTrackInstance(currentTrackIndex, false);
             setupEventInteractions();
-            
+
             window.addEventListener('resize', () => {
                 loadTargetTrackInstance(currentTrackIndex, false);
             });
 
-            // FIXED: Functional layout collapse control for top selection tabs
             const chevronBtn = document.getElementById('collapse-chevron-btn');
             const tabHeaderMenu = document.getElementById('main-tabs');
-            
+
             chevronBtn.addEventListener('click', () => {
                 tabHeaderMenu.classList.toggle('hidden-tabs');
                 chevronBtn.classList.toggle('inverted');
             });
+
+            // iOS FIX #6: Unlock audio on ANY first touch anywhere on the document.
+            // This ensures it's ready before the user even taps play.
+            document.addEventListener('touchstart', unlockAudioForIOS, { once: true, passive: true });
+            document.addEventListener('mousedown', unlockAudioForIOS, { once: true, passive: true });
         }
 
         function generateWaveformTemplateProfile() {
@@ -588,46 +557,73 @@
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
+        function setLoadingState(isLoading) {
+            if (isLoading) {
+                playBtn.classList.add('loading');
+            } else {
+                playBtn.classList.remove('loading');
+            }
+        }
+
         function loadTargetTrackInstance(index, triggerPlayback = false) {
             if (index < 0 || index >= tracks.length) return;
-            
+
             audioEngineNode.pause();
             videoEngineNode.pause();
-            
+            setLoadingState(false);
+
             currentTrackIndex = index;
             const track = tracks[currentTrackIndex];
 
             playerTrackTitle.innerText = track.name;
 
-            // FIXED: Removed absolute block/alert banner handling logic for audio files completely
             if (track.type === "video") {
                 activePlaybackEngineNode = videoEngineNode;
                 audioCoverPlaceholder.style.display = "none";
                 videoEngineNode.style.display = "block";
-                
+
                 videoEngineNode.src = track.url;
-                videoEngineNode.load();
+                // iOS FIX #7: Do NOT call .load() before .play() for video —
+                // call load only to reset, then let play() handle loading.
                 videoEngineNode.currentTime = 0;
-                
                 videoEngineNode.onloadedmetadata = () => calculateAndSyncFakeProgress();
+
             } else {
                 activePlaybackEngineNode = audioEngineNode;
                 audioCoverPlaceholder.style.display = "flex";
                 videoEngineNode.style.display = "none";
-                
+
                 if (track.isPlaceholder) {
-                    audioEngineNode.src = "";
+                    // iOS FIX #8: Clear src completely for placeholder tracks.
+                    // Setting src="" on iOS can throw a MediaError — use removeAttribute instead.
+                    audioEngineNode.removeAttribute('src');
                     updateWaveformScrubView(mockPlaceholderTime, track.fakeDuration || track.placeholderDuration);
                 } else {
+                    // iOS FIX #9: Assign src directly — do NOT call .load() separately.
+                    // On iOS Safari, calling .load() resets the element and can cause
+                    // the subsequent .play() to be treated as a non-gesture call.
                     audioEngineNode.src = track.url;
-                    audioEngineNode.load();
                     audioEngineNode.currentTime = 0;
                     audioEngineNode.onloadedmetadata = () => calculateAndSyncFakeProgress();
                 }
             }
 
             if (triggerPlayback && activePlaybackEngineNode && !track.isPlaceholder) {
-                activePlaybackEngineNode.play().catch(e => console.log("Playback interaction deferred"));
+                // iOS FIX #10: Always chain .play() with .catch() to handle the
+                // NotAllowedError that iOS throws when gesture requirements aren't met.
+                // Show a loading spinner while the media is buffering on mobile.
+                setLoadingState(true);
+                const playPromise = activePlaybackEngineNode.play();
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => setLoadingState(false))
+                        .catch(err => {
+                            setLoadingState(false);
+                            console.warn('iOS playback blocked:', err.name, err.message);
+                            // Don't alert — just silently update UI to show paused state
+                            updatePlayPauseButtonUIState();
+                        });
+                }
             }
 
             updatePlayPauseButtonUIState();
@@ -660,22 +656,18 @@
                 const bar = document.createElement('div');
                 bar.classList.add('wave-bar');
                 bar.style.height = `${waveformHeightsMap[i]}px`;
-                
-                if (i <= splitActiveIndex) {
-                    bar.classList.add('played');
-                } else {
-                    bar.classList.add('remaining');
-                }
+                bar.classList.add(i <= splitActiveIndex ? 'played' : 'remaining');
                 waveformTimeline.appendChild(bar);
             }
         }
 
         function updatePlayPauseButtonUIState() {
-            if (activePlaybackEngineNode && !activePlaybackEngineNode.paused && activePlaybackEngineNode.src !== "") {
-                playIcon.className = "fa-solid fa-pause";
-            } else {
-                playIcon.className = "fa-solid fa-play";
-            }
+            const isPlaying = activePlaybackEngineNode &&
+                              !activePlaybackEngineNode.paused &&
+                              activePlaybackEngineNode.src !== "" &&
+                              activePlaybackEngineNode.getAttribute('src') !== null;
+
+            playIcon.className = isPlaying ? "fa-solid fa-pause" : "fa-solid fa-play";
         }
 
         function setupEventInteractions() {
@@ -687,32 +679,58 @@
             audioEngineNode.addEventListener('timeupdate', syncProgressHandler);
             videoEngineNode.addEventListener('timeupdate', syncProgressHandler);
 
-            const playStateUIHandler = () => updatePlayPauseButtonUIState();
+            const playStateUIHandler = () => {
+                setLoadingState(false);
+                updatePlayPauseButtonUIState();
+            };
+
             audioEngineNode.addEventListener('play', playStateUIHandler);
             audioEngineNode.addEventListener('pause', playStateUIHandler);
             videoEngineNode.addEventListener('play', playStateUIHandler);
             videoEngineNode.addEventListener('pause', playStateUIHandler);
 
+            // Show loading spinner while iOS buffers
+            audioEngineNode.addEventListener('waiting', () => setLoadingState(true));
+            audioEngineNode.addEventListener('canplay', () => setLoadingState(false));
+            videoEngineNode.addEventListener('waiting', () => setLoadingState(true));
+            videoEngineNode.addEventListener('canplay', () => setLoadingState(false));
+
             const trackEndRouteHandler = () => executeNavigationStep(1);
             audioEngineNode.addEventListener('ended', trackEndRouteHandler);
             videoEngineNode.addEventListener('ended', trackEndRouteHandler);
 
+            // iOS FIX #11: The play button handler must call .play() SYNCHRONOUSLY
+            // within the tap event — no setTimeout, no await, no promise chains before it.
+            // iOS checks that .play() is called in the same call stack as the user gesture.
             playBtn.addEventListener('click', () => {
+                unlockAudioForIOS(); // ensure unlocked on tap
+
                 const track = tracks[currentTrackIndex];
-                
+
                 if (track.isPlaceholder) {
-                    alert("This placeholder profile item requires a valid local file track upload first.");
+                    alert("This placeholder requires a real audio file upload first.");
                     return;
                 }
 
-                if (activePlaybackEngineNode) {
-                    if (activePlaybackEngineNode.paused) {
-                        activePlaybackEngineNode.play();
-                    } else {
-                        activePlaybackEngineNode.pause();
+                if (!activePlaybackEngineNode) return;
+
+                if (activePlaybackEngineNode.paused) {
+                    // SYNCHRONOUS play() call — required by iOS
+                    setLoadingState(true);
+                    const p = activePlaybackEngineNode.play();
+                    if (p !== undefined) {
+                        p.then(() => setLoadingState(false))
+                         .catch(err => {
+                             setLoadingState(false);
+                             console.warn('Play blocked:', err.name);
+                             updatePlayPauseButtonUIState();
+                         });
                     }
-                    updatePlayPauseButtonUIState();
+                } else {
+                    activePlaybackEngineNode.pause();
                 }
+
+                updatePlayPauseButtonUIState();
             });
 
             prevBtn.addEventListener('click', () => executeNavigationStep(-1));
@@ -720,7 +738,6 @@
 
             waveformWindow.addEventListener('click', (e) => {
                 const track = tracks[currentTrackIndex];
-
                 const rect = waveformWindow.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
                 const ratio = Math.min(1, Math.max(0, clickX / rect.width));
@@ -749,33 +766,41 @@
         function handleImportedFilesList(filesList) {
             if (!filesList || filesList.length === 0) return;
             const file = filesList[0];
-            
+
             let detectedAssetType = "";
             if (file.type.startsWith('audio/')) {
                 detectedAssetType = "audio";
-            } else if (file.type === "video/mp4") {
+            } else if (file.type === "video/mp4" || file.type.startsWith('video/')) {
                 detectedAssetType = "video";
             } else {
-                alert("Unsupported configuration option. Please upload standard MP3 audio or MP4 video files only.");
+                alert("Unsupported format. Please upload MP3 audio or MP4 video.");
                 return;
             }
 
-            const trackObjectUrl = URL.createObjectURL(file);
-            const cleanUploadedTrackName = file.name.replace(/\.[^/.]+$/, "");
+            // iOS FIX #12: Use FileReader to convert to base64 data URL instead of
+            // createObjectURL. On iOS Safari, blob: URLs for audio are unreliable —
+            // they can silently fail to load or produce MediaError 4 (MEDIA_ERR_SRC_NOT_SUPPORTED).
+            // A data: URL embeds the file directly and works consistently across all iOS versions.
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const dataUrl = ev.target.result;
+                const cleanName = file.name.replace(/\.[^/.]+$/, "");
 
-            const newTrackDataStructure = {
-                name: cleanUploadedTrackName,
-                url: trackObjectUrl,
-                type: detectedAssetType,
-                isPlaceholder: false,
-                fakeDuration: null
+                const newTrack = {
+                    name: cleanName,
+                    url: dataUrl,
+                    type: detectedAssetType,
+                    isPlaceholder: false,
+                    fakeDuration: null
+                };
+
+                tracks.push(newTrack);
+                renderDashboardPlaylist();
+                switchPanelTab('player');
+                loadTargetTrackInstance(tracks.length - 1, true);
             };
-
-            tracks.push(newTrackDataStructure);
-            renderDashboardPlaylist();
-            
-            switchPanelTab('player');
-            loadTargetTrackInstance(tracks.length - 1, true);
+            reader.onerror = () => alert("Failed to read file. Please try again.");
+            reader.readAsDataURL(file);
         }
 
         function renderDashboardPlaylist() {
@@ -783,7 +808,7 @@
             tracks.forEach((track, idx) => {
                 const item = document.createElement('div');
                 item.className = `track-item ${idx === currentTrackIndex ? 'active' : ''}`;
-                
+
                 item.addEventListener('click', (e) => {
                     if (e.target.closest('.action-btn')) return;
                     loadTargetTrackInstance(idx, true);
@@ -799,7 +824,9 @@
                     displayDuration = "Native Dynamic Time";
                 }
 
-                const typeIcon = track.type === 'video' ? '<i class="fa-solid fa-video"></i>' : '<i class="fa-solid fa-music"></i>';
+                const typeIcon = track.type === 'video'
+                    ? '<i class="fa-solid fa-video"></i>'
+                    : '<i class="fa-solid fa-music"></i>';
 
                 item.innerHTML = `
                     <div class="track-item-info">
@@ -858,7 +885,7 @@
                         calculateAndSyncFakeProgress();
                     }
                 }
-                
+
                 editIndexInput.value = "-1";
                 trackNameInput.value = "";
                 fakeMinInput.value = "";
