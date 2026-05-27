@@ -370,6 +370,26 @@
                 <input type="file" id="file-input" accept="audio/*,video/mp4">
             </div>
 
+            <!-- URL Import Section -->
+            <div style="margin-bottom: 24px;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                    <div style="flex:1; height:1px; background:#e5e7eb;"></div>
+                    <span style="font-size:12px; font-weight:600; color:#9ca3af; white-space:nowrap;">OR ADD BY URL</span>
+                    <div style="flex:1; height:1px; background:#e5e7eb;"></div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <input type="url" id="url-import-input" placeholder="https://example.com/song.mp3"
+                        style="flex:1; padding:12px; border:1px solid #d1d5db; border-radius:8px; font-size:13px; outline:none; min-width:0;"
+                        inputmode="url" autocorrect="off" autocapitalize="none" spellcheck="false">
+                    <button id="url-import-btn"
+                        style="padding:12px 16px; background:#000; color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0;">
+                        + Add
+                    </button>
+                </div>
+                <p style="font-size:11px; color:#9ca3af; margin-top:6px;">Paste a direct link to an MP3, M4A, AAC, OGG, or MP4 file</p>
+                <div id="url-error-msg" style="display:none; font-size:12px; color:#dc2626; margin-top:6px;"></div>
+            </div>
+
             <input type="hidden" id="edit-index" value="-1">
 
             <div class="form-group">
@@ -902,6 +922,82 @@
             if (currentTrackIndex >= tracks.length) currentTrackIndex = tracks.length - 1;
             loadTargetTrackInstance(currentTrackIndex, false);
         };
+
+        // URL Import Handler
+        const urlImportInput = document.getElementById('url-import-input');
+        const urlImportBtn = document.getElementById('url-import-btn');
+        const urlErrorMsg = document.getElementById('url-error-msg');
+
+        function showUrlError(msg) {
+            urlErrorMsg.textContent = msg;
+            urlErrorMsg.style.display = 'block';
+        }
+        function clearUrlError() {
+            urlErrorMsg.style.display = 'none';
+            urlErrorMsg.textContent = '';
+        }
+
+        function guessTypeFromUrl(url) {
+            const clean = url.split('?')[0].toLowerCase();
+            if (clean.endsWith('.mp4') || clean.endsWith('.mov') || clean.endsWith('.webm')) return 'video';
+            return 'audio'; // default
+        }
+
+        function nameFromUrl(url) {
+            try {
+                const path = new URL(url).pathname;
+                const parts = path.split('/').filter(Boolean);
+                const last = parts[parts.length - 1] || 'Untitled Track';
+                return decodeURIComponent(last.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' '));
+            } catch(e) {
+                return 'Untitled Track';
+            }
+        }
+
+        function handleUrlImport() {
+            clearUrlError();
+            const rawUrl = urlImportInput.value.trim();
+
+            if (!rawUrl) { showUrlError('Please enter a URL.'); return; }
+
+            let parsedUrl;
+            try { parsedUrl = new URL(rawUrl); }
+            catch(e) { showUrlError("That doesn't look like a valid URL. Make sure it starts with https://"); return; }
+
+            if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') {
+                showUrlError('Only http:// and https:// URLs are supported.');
+                return;
+            }
+
+            const assetType = guessTypeFromUrl(rawUrl);
+            const trackName = nameFromUrl(rawUrl);
+
+            const newTrack = {
+                name: trackName,
+                url: rawUrl,
+                type: assetType,
+                isPlaceholder: false,
+                fakeDuration: null,
+                isUrl: true
+            };
+
+            tracks.push(newTrack);
+            renderDashboardPlaylist();
+            urlImportInput.value = '';
+
+            // Pre-fill name editor so user can rename right away
+            trackNameInput.value = trackName;
+            editIndexInput.value = tracks.length - 1;
+            formActionLabel.innerText = 'Rename track (optional):';
+
+            switchPanelTab('player');
+            loadTargetTrackInstance(tracks.length - 1, true);
+        }
+
+        urlImportBtn.addEventListener('click', handleUrlImport);
+        urlImportInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleUrlImport(); });
+        urlImportInput.addEventListener('focus', () => { urlImportInput.style.borderColor = '#000'; });
+        urlImportInput.addEventListener('blur', () => { urlImportInput.style.borderColor = '#d1d5db'; });
 
         initializeApplication();
     </script>
